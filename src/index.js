@@ -10,7 +10,7 @@ const breedSelect = document.querySelector('.breed-select');
 const loader = document.querySelector('.loader');
 const error = document.querySelector('.error');
 const catInfo = document.querySelector('.cat-info');
-/** @type {HTMLScriptElement | null} */
+
 
 breedSelect.style.display = 'none';
 
@@ -27,7 +27,7 @@ fetchBreeds().then((data) => {
     breeds.innerHTML = html;
 });
 
-breeds.addEventListener('select', (event) => {
+breeds.addEventListener('change', (event) => {
     const breed = event.target.value;
     fetchCatByBreed(breed).then((cat) => {
         catInfo.innerHTML = JSON.stringify(cat);
