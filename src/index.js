@@ -3,33 +3,64 @@ import axios from 'axios';
 import Notiflix from 'notiflix';
 
 axios.defaults.headers.common['x-api-key'] =
-  'live_WagMdIF7ZqVDncxD6bHPhxwDmM67WgiT7CsuNKWmlnzLqGnoJvt9wMlAt3OTqqAR';
-  axios.defaults.baseURL='https://api.thecatapi.com/v1';
+  'live_FGH9lasd0oul4RhK4aaXXVevkdqzPmluPpIdqRAPTVq9GAtoohZ7VPmrFhJI1oqr';
 
 const breedSelect = document.querySelector('.breed-select');
 const loader = document.querySelector('.loader');
 const error = document.querySelector('.error');
 const catInfo = document.querySelector('.cat-info');
 
-
 breedSelect.style.display = 'none';
 
-function fetchBreeds(){
-    return axios.get('/breeds') .then(({ data }) => data);
-}
+fetchBreeds()
+  .then(data => {
+    const options = data.data;
 
-function fetchCatByBreed(breedId){
-    return axios.get(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`).then(({data}) => data);
-}
+    loader.style.display = 'block';
+    error.style.display = 'none';
 
-fetchBreeds().then((data) => {
-    const html = data.map((breed) => `<option value="${breedId}">${breed.name}<option>`);
-    breeds.innerHTML = html;
-});
+    breedSelect.innerHTML = options
+      .map(breed => `<option value="${breed.id}">${breed.name}</option>`)
+      .join('');
 
-breeds.addEventListener('change', (event) => {
-    const breed = event.target.value;
-    fetchCatByBreed(breed).then((cat) => {
-        catInfo.innerHTML = JSON.stringify(cat);
+    loader.style.display = 'none';
+  })
+  .catch(() => {
+    loader.style.display = 'none';
+    error.style.display = 'block';
+  })
+  .finally(() => {
+    breedSelect.style.display = 'block';
+  });
+
+breedSelect.addEventListener('change', event => {
+  error.style.display = 'none';
+  loader.style.display = 'block';
+  catInfo.style.display = 'none';
+
+  const breed = event.target.value;
+
+  fetchCatByBreed(breed)
+    .then(data => {
+      const catData = data.data[0].breeds[0];
+
+      if (catData) {
+        catInfo.innerHTML = `
+          <p>${catData.name}</p>
+          <p>${catData.description}</p>
+          <p>${catData.temperament}</p>
+          <img src='${data.data[0].url}' >`;
+      } else {
+        catInfo.innerHTML = Notiflix.Notify.failure(
+          'No information available for this breed'
+        );
+      }
+
+      loader.style.display = 'none';
+      catInfo.style.display = 'block';
     })
+    .catch(() => {
+      loader.style.display = 'none';
+      error.style.display = 'block';
+    });
 });
