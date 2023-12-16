@@ -29,3 +29,8 @@
     0% , 100%{ transform: translate(15px) }
     50% { transform: translate(-15px) }
   }
+
+  img{
+    max-width: 400px;
+    max-height: 200px;  
+  }
